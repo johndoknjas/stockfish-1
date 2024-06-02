@@ -1,11 +1,17 @@
+*
+!*.*
+!*/
+!LICENSE
+
+*.exe
+/Notes/
+/stockfish/main.py
+
 .DS_Store
 *.pyc
 /.idea/
 /.eggs/
 /stockfish.egg-info/
-/.mypy_cache/
-/.pytest_cache/
-__pycache/
 /build/
 /dist/
 /venv/
@@ -13,3 +19,5 @@ __pycache/
 */*/__pycache__
 coverage.xml
 .coverage
+docs/
+.vscode/
