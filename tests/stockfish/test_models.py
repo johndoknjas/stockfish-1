@@ -118,6 +118,9 @@ class TestStockfish:
                 stockfish.raw_stockfish_output(f)
 
     # todo - continue from here with rest of raw_stockfish_output occurrences
+    # also, wondering why having copy.copy() in raw output function (in models) seems to correlate with
+    # "b1c3" being a best move given by `stockfish.get_best_move(wtime=1000, btime=1000)` in 
+    # test_get_best_move_remaining_time_first_move, since raw output function isn't used by the test (nor in previous tests).
 
     def test_info_raises_error_by_default(self, stockfish: Stockfish):
         with pytest.raises(ValueError):

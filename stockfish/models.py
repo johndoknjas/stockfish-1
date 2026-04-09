@@ -509,7 +509,7 @@ class Stockfish:
         ]
         """
         try:
-            return copy.copy(self._raw_stockfish_output[func.__name__])
+            return self._raw_stockfish_output[func.__name__]
         except KeyError:
             raise ValueError(f"No `info` line recorded for {func.__name__}!")
 
