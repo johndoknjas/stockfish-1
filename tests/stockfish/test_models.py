@@ -525,10 +525,12 @@ class TestStockfish:
 
     def test_get_fen_position_after_some_moves(self, stockfish: Stockfish):
         stockfish.make_moves_from_start(["e2e4", "e7e6"])
-        assert (
-            stockfish.get_fen_position()
-            == "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
-        )
+        expected_fen = "rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"
+        assert stockfish.get_fen_position() == expected_fen
+        for invalid_moves in (["d2d4 d7d5"], ["d2d4", "d7d5", "e4e5"]):
+            with pytest.raises(ValueError):
+                stockfish.make_moves_from_start(invalid_moves)
+            assert stockfish.get_fen_position() == expected_fen
 
     @pytest.mark.slow
     def test_get_evaluation_cp(self, stockfish: Stockfish):
@@ -591,7 +593,7 @@ class TestStockfish:
             stockfish.set_fen_position("8/8/8/8/8/4k3/4p3/r3K3 w - - 0 1")
             assert stockfish.get_static_eval() is None
         stockfish.send_ucinewgame_command()
-        stockfish.make_moves_from_start(None)
+        stockfish.make_moves_from_start([])
         stockfish.get_static_eval()
         stockfish._put("go depth 2")
         assert stockfish._read_line() != ""
@@ -876,11 +878,18 @@ class TestStockfish:
 
     def test_make_moves_from_current_position(self, stockfish: Stockfish):
         stockfish.set_fen_position(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1"
+        )
+        fen1 = stockfish.get_fen_position()
+        stockfish.make_moves_from_current_position([])
+        assert fen1 == stockfish.get_fen_position()
+
+        stockfish.set_fen_position(
             "r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
         )
-        fen = stockfish.get_fen_position()
+        fen2 = stockfish.get_fen_position()
         stockfish.make_moves_from_current_position([])
-        assert fen == stockfish.get_fen_position()
+        assert fen2 == stockfish.get_fen_position()
 
         stockfish.make_moves_from_current_position(["e1g1"])
         assert (
@@ -1473,7 +1482,9 @@ class TestStockfish:
 
     def test_pick(self, stockfish: Stockfish):
         info = "info depth 10 seldepth 15 multipv 1 score cp -677 wdl 0 0 1000"
-        line = info.split(" ")
+        line = [
+            x for x in info.split(" ")
+        ]  # hack to get around `list[LiteralString]` issue
         assert stockfish._pick(line, "depth") == "10"
         assert stockfish._pick(line, "multipv") == "1"
         assert stockfish._pick(line, "wdl", 3) == "1000"
