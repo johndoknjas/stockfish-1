@@ -403,7 +403,6 @@ class Stockfish:
 
         >>> stockfish.make_moves_from_start(['e2e4', 'e7e5'])
         """
-
         self._make_moves_from_given_position(
             [] if moves is None else moves,
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
@@ -421,7 +420,6 @@ class Stockfish:
 
         >>> stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
         """
-
         self._make_moves_from_given_position(moves, self.get_fen_position())
 
     def _expected_full_move_increase(self, num_moves: int) -> int:
