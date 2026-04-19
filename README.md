@@ -53,7 +53,7 @@ There are some default engine settings used by this wrapper. For increasing Stoc
     "Slow Mover": 100,
     "UCI_Chess960": False,
     "UCI_LimitStrength": False,
-    "UCI_Elo": 1350 # ignored by default in favour of "Skill Level"
+    "UCI_Elo": 1350 # Ignored by default in favour of "Skill Level".
 }
 ```
 
