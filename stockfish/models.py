@@ -378,6 +378,8 @@ class Stockfish:
             )
         old_fen = self.get_fen_position()
         self.set_fen_position(fen)
+        if not moves:
+            return
         expected_new_fullmove_count = (
             self._full_move_count() + self._expected_full_move_increase(len(moves))
         )
