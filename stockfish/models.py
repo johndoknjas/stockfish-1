@@ -371,6 +371,29 @@ class Stockfish:
             )
         self._put(f"position fen {' '.join(fen_position.split())}")
 
+    def _make_moves_from_given_position(self, moves: list[str], fen: str) -> None:
+        if any(x for x in moves if x != "".join(x.split())):
+            raise ValueError(
+                "Each move should be a string, and should not contain any whitespace"
+            )
+        old_fen = self.get_fen_position()
+        self.set_fen_position(fen)
+        if not moves:
+            return
+        expected_new_fullmove_count = (
+            self._full_move_count() + self._expected_full_move_increase(len(moves))
+        )
+        should_be_whites_turn_after = self._will_be_whites_turn_after_moves(len(moves))
+        self._put(f"position fen {fen} moves {' '.join(moves)}")
+        if (
+            self._full_move_count() != expected_new_fullmove_count
+            or self._is_whites_turn() != should_be_whites_turn_after
+        ):
+            self.set_fen_position(old_fen)
+            raise ValueError(
+                f"Incorrect move sequence sent to Stockfish. The wrapper has reset the position back to {old_fen}."
+            )
+
     def make_moves_from_start(self, moves: list[str] | None = None) -> None:
         """Sets the position by making a sequence of moves from the starting position of chess.
 
@@ -382,12 +405,12 @@ class Stockfish:
 
         >>> stockfish.make_moves_from_start(['e2e4', 'e7e5'])
         """
-        self.set_fen_position(
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        self._make_moves_from_given_position(
+            [] if moves is None else moves,
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
         )
-        self.make_moves_from_current_position(moves)
 
-    def make_moves_from_current_position(self, moves: list[str] | None) -> None:
+    def make_moves_from_current_position(self, moves: list[str]) -> None:
         """Sets a new position by playing the moves from the current position.
 
         `moves`
@@ -399,26 +422,7 @@ class Stockfish:
 
         >>> stockfish.make_moves_from_current_position(["g4d7", "a8b8", "f1d1"])
         """
-        if not moves:
-            return
-        if any(x for x in moves if x != "".join(x.split())):
-            raise ValueError(
-                "Each move should be a string, and should not contain any whitespace"
-            )
-        fen = self.get_fen_position()
-        expected_new_fullmove_count = (
-            self._full_move_count() + self._expected_full_move_increase(len(moves))
-        )
-        should_be_whites_turn_after = self._will_be_whites_turn_after_moves(len(moves))
-        self._put(f"position fen {fen} moves {' '.join(moves)}")
-        if (
-            self._full_move_count() != expected_new_fullmove_count
-            or self._is_whites_turn() != should_be_whites_turn_after
-        ):
-            self.set_fen_position(fen)
-            raise ValueError(
-                f"Incorrect move sequence sent to Stockfish. The wrapper has reset the position to {fen}."
-            )
+        self._make_moves_from_given_position(moves, self.get_fen_position())
 
     def _expected_full_move_increase(self, num_moves: int) -> int:
         return int(num_moves / 2) + (
