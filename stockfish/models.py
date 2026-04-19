@@ -571,8 +571,10 @@ class Stockfish:
             {"UCI_LimitStrength": False, "Skill Level": skill_level}
         )
 
-    def set_elo_rating(self, elo_rating: int = 1350) -> None:
-        """Sets the elo rating of the Stockfish engine, ignoring skill level.
+    def set_elo_rating(self, elo_rating: int) -> None:
+        """Sets the elo rating of the Stockfish engine, ignoring skill level. Note that by default,
+        Stockfish uses a skill level of 20 (ignoring elo), which is full strength. So you should only call
+        `set_elo_rating` if you want Stockfish to play on a weaker setting.
 
         `elo_rating`
 
